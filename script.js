@@ -1,10 +1,12 @@
 // grab the HTML elements
 
 const productContainer = document.querySelector(".product-container");
-const CartBtn = document.getElementById("cart-btn");
+const cartBtn = document.getElementById("cart-btn");
 const modalElem = document.getElementById("cart-btn");
-const cartCountElemen = document.getElementById("cart-count");
-
+const cartCountElem = document.getElementById("cart-count");
+const closeBtn = document.querySelector(".close-btn")
+let productsArray = [];
+let cart = [];
 // create a function to fetch store products from the free endpoint API
 async function fetchProducts() {
     try {
@@ -28,11 +30,51 @@ function displayFetchedProducts(products) {
         <h3>${product.title}</h3>
         <p>${product.description.slice(0,100)}...</p>
         <p class="price">$${product.price}</p>
+        <button onclick="addToCart(${product.id})"> Add to Cart </button>
         </div>
         `
     }).join("");
     productContainer.innerHTML = productCard;
 }
+// create a function to add item to cart
+function addToCart(productId) {
+    const product = productsArray.find((product) => {
+        return product.id === productId;
+    });
+    const existingProduct = cart.find((item) => {
+        return item.id === productId;
+    });
 
+    if(existingProduct) {
+        existingProduct.quantity += 1;
+    } else {
+        cart.push({...product,quantity: 1})
+    }
+    updateCartInterFace();
+};
+
+function updateCartInterFace() {
+    //calculate the total count
+    const totalCartItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    cartCountElem.innerText = totalCartItems;
+
+    // item list
+    const cartContainer = document.getElementById("cart-items");
+    cartContainer.innerHTML =cart.map((item) => {
+        return `
+        <div class="cart-items">
+        <span>${item.title.slice(0,15)}...(x${item.quantity})</span>
+        <span>$${(item.price * item.quantity). toFixed(2)}</span>
+        </div>
+        `
+    }).join("");
+}
+
+// click the cart buttton to toggle and display the content of the cart
+function toggleCart(){
+    document.getElementById("cart-modal").classList.toggle("hidden")
+}
+cartBtn.addEventListener("click", toggleCart);
+closeBtn.addEventListener("click", toggleCart);
 //load products when the page loads and the document sinishes parsing
 document.addEventListener("DOMContentLoaded", fetchProducts);
