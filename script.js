@@ -23,7 +23,7 @@ async function fetchProducts() {
 function displayFetchedProducts(products) {
     const productCard = products.map((product) => {
         return `
-        <div class ="product-class">
+        <div class ="product-card">
         <img src="${product.image}" alt="${product.title}">
         <h3>${product.title}</h3>
         <p>${product.description.slice(0,100)}...</p>
